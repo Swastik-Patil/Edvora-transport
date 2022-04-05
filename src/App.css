@@ -1,0 +1,246 @@
+@import url("https://fonts.googleapis.com/css?family=Inter");
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+.hide {
+  display: none !important;
+}
+.Header {
+  background-color: #101010;
+  color: #fff;
+  padding: 1rem;
+  width: 100%;
+  min-height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.title {
+  width: 114px;
+  height: 43px;
+
+  font-family: "SF Pro Display";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 43px;
+  /* identical to box height */
+
+  color: #ffffff;
+
+  text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+.profile {
+  width: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+.userName {
+  width: 121px;
+  height: 24px;
+
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 24px;
+
+  color: #ffffff;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+
+  border-radius: 22px;
+  transform: rotate(-0.36deg);
+}
+
+.Navbar {
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  cursor: pointer;
+}
+.NavItems {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+.NavItem {
+  font-family: Inter;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 22px;
+  letter-spacing: 0px;
+  padding-inline: 0.9rem;
+  text-align: right;
+}
+.active {
+  font-family: Inter;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 22px;
+  letter-spacing: 0px;
+  text-align: left;
+  position: relative;
+
+  animation-timing-function: ease-out;
+  animation-duration: 300ms;
+}
+.active:after {
+  content: "";
+  position: absolute;
+  width: 90%;
+  height: 2px;
+  background-color: #fff;
+  bottom: -7px;
+  left: 8px;
+  border-radius: 1px;
+}
+.burger {
+  position: relative;
+  height: 2px;
+  width: 12px;
+  background-color: #fff;
+}
+.burger::before {
+  content: "";
+  height: 2px;
+  width: 18px;
+  position: absolute;
+  top: -5px;
+  background-color: #fff;
+}
+.burger::after {
+  content: "";
+  height: 2px;
+  width: 6px;
+  position: absolute;
+  bottom: -5px;
+  background-color: #fff;
+}
+.filter {
+  position: relative;
+  width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+.filterOptions {
+  font-family: Inter;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 19px;
+  letter-spacing: 0px;
+  text-align: left;
+  position: relative;
+
+  height: 19px;
+  width: 48px;
+}
+
+.filterBox {
+  position: absolute;
+  height: 190px;
+  width: 228px;
+  border-radius: 15px;
+  background: #131313;
+
+  top: 30px;
+  right: -5px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.filterBox > div {
+  padding: 0.5rem;
+}
+
+select {
+  background: #232323;
+  cursor: pointer;
+  position: relative;
+  font-size: 16px;
+  color: #ffffff;
+  width: 168.45px;
+  height: 37.5px;
+  border-radius: 4.7px;
+  border: none;
+  padding: 0.5rem;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem;
+  width: 95%;
+}
+
+.RideDetails {
+  min-width: 95%;
+  position: relative;
+  border-radius: 10px;
+  background: #171717;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+}
+.details {
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+  padding: 1rem;
+}
+
+.map {
+  height: 148px;
+  width: 296px;
+  border-radius: 5px;
+  margin-inline: 0.5rem;
+}
+
+.location {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: calc(max-content + 30px);
+  position: absolute;
+  right: 20px;
+  top: 20px;
+}
+
+.city {
+  background: #0000008f;
+  padding: 4px 10px;
+  color: #ffffff;
+  border-radius: 16px;
+  font-family: Inter;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 15px;
+  letter-spacing: 0em;
+  text-align: left;
+}
+.state {
+  background: #0000008f;
+  padding: 4px 10px;
+  color: #ffffff;
+  border-radius: 16px;
+  font-family: Inter;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 15px;
+  letter-spacing: 0em;
+  text-align: left;
+}
