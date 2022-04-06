@@ -1,11 +1,45 @@
-import React from "react";
+import React, { useState } from "react";
 
 function NavControl(props) {
-  const handleClick = (e) => {
-    const options = document.querySelectorAll(".NavItems");
+  const options = document.querySelectorAll(".NavItems");
+  const filterBox = document.getElementById("filter-box");
+  const state = document.getElementById("state");
+  const city = document.getElementById("city");
 
-    var toggleOptions = [];
+  let cities = removeDuplicates(props.cityList.sort());
+  let states = removeDuplicates(props.stateList.sort());
+  let nearest = props.nearest;
+  let selectedState = "";
+  let selectedCity = "";
+  let toggleOptions = [];
+  let currentOption = [];
+  let filteredData = [];
 
+  function validateLocation(ele) {
+    if (ele.state === selectedState || ele.city === selectedCity) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  function validateNearest(ele) {
+    if (ele.distance) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  function removeDuplicates(arr) {
+    return [...new Set(arr)];
+  }
+
+  function handleFilterBox() {
+    filterBox.classList.toggle("hide");
+  }
+
+  function handleClick(e) {
     options.forEach((option) => {
       toggleOptions.push(option.childNodes);
     });
@@ -16,52 +50,51 @@ function NavControl(props) {
       });
     });
 
-    const currOption = e.target;
-    currOption.classList.add("active");
+    currentOption = e.target;
+    currentOption.classList.add("active");
 
+    // Selection of Nearest , Upcoming , Past Rides
     if (e.target.textContent === "Nearest rides") {
-      console.log("Nearest rides");
-    } else if (e.target.textContent === "Upcoming rides") {
-      console.log("Upcoming rides");
-    } else {
-      console.log("Past rides");
-    }
-  };
-
-  const handleFilterBox = () => {
-    const filterBox = document.getElementById("filter-box");
-    filterBox.classList.toggle("hide");
-  };
-
-  const cities = props.cities.sort();
-  const states = props.states.sort();
-
-  var selectedState = "";
-  var selectedCity = "";
-
-  const handleFilter = (e) => {
-    var city = document.getElementById("city");
-    selectedCity = city.options[city.selectedIndex].text;
-
-    var state = document.getElementById("state");
-    selectedState = state.options[state.selectedIndex].text;
-
-    const rideContainers = document.querySelectorAll(".container");
-    // console.log(rideContainers);
-
-    if (selectedState === "State" && selectedCity === "City") {
-      rideContainers.forEach((rideContainer) => {
-        rideContainer.classList.remove("hide");
+      //
+      let distance = document.querySelectorAll(".distance");
+      let dis = [];
+      distance.forEach((d) => {
+        dis.push(d.textContent);
       });
-    } else if (selectedState !== "State" || selectedCity === "City") {
-      const states = [];
-      rideContainers.forEach((rideContainer) => {
-        if (
-          document.querySelectorAll(".state")[0].textContent === selectedState
-        ) {
-          console.log(document.querySelectorAll(".state")[0].textContent);
+      dis.sort();
+
+      console.log(dis);
+
+      nearest.forEach((ride, index) => {
+        if (dis[index] === ride.distance) {
+          filteredData.push(ride);
         }
       });
+      props.sendFilteredData(filteredData);
+
+      // filteredData.map((ride, index) => {
+      //   ride.distance = dis.shift();
+      //   console.log(ride.distance);
+      // });
+
+      // props.sendFilteredData(filteredData);
+    } else if (e.target.textContent === "Upcoming rides") {
+      //
+    } else {
+      //
+    }
+  }
+
+  const handleFilter = (e) => {
+    selectedCity = city.options[city.selectedIndex].text;
+    selectedState = state.options[state.selectedIndex].text;
+
+    if (selectedState === "State" && selectedCity === "City") {
+      filteredData = props.rides;
+      props.sendFilteredData(filteredData);
+    } else if (selectedState !== "State" || selectedCity !== "City") {
+      filteredData = nearest.filter(validateLocation);
+      props.sendFilteredData(filteredData);
     }
   };
 
@@ -87,7 +120,7 @@ function NavControl(props) {
           <div className="filterTitle">Filters</div>
           <div className="filterItem">
             <select name="state" id="state" onChange={handleFilter}>
-              <option value="">State</option>
+              <option value="State">State</option>
               {states.map((state, index) => (
                 <option key={index} value={state}>
                   {state}
@@ -97,7 +130,7 @@ function NavControl(props) {
           </div>
           <div className="filterItem">
             <select name="city" id="city" onChange={handleFilter}>
-              <option value="">City</option>
+              <option value="City">City</option>
               {cities.map((city, index) => (
                 <option key={index} value={city}>
                   {city}
