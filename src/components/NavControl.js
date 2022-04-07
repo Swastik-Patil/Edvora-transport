@@ -9,6 +9,7 @@ function NavControl(props) {
   let cities = removeDuplicates(props.cityList.sort());
   let states = removeDuplicates(props.stateList.sort());
   let nearest = props.nearest;
+  let rides = props.rides;
   let selectedState = "";
   let selectedCity = "";
   let toggleOptions = [];
@@ -17,14 +18,6 @@ function NavControl(props) {
 
   function validateLocation(ele) {
     if (ele.state === selectedState || ele.city === selectedCity) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  function validateNearest(ele) {
-    if (ele.distance) {
       return true;
     } else {
       return false;
@@ -54,34 +47,21 @@ function NavControl(props) {
     currentOption.classList.add("active");
 
     // Selection of Nearest , Upcoming , Past Rides
-    if (e.target.textContent === "Nearest rides") {
-      //
-      let distance = document.querySelectorAll(".distance");
-      let dis = [];
-      distance.forEach((d) => {
-        dis.push(d.textContent);
-      });
-      dis.sort();
-
-      console.log(dis);
-
-      nearest.forEach((ride, index) => {
-        if (dis[index] === ride.distance) {
-          filteredData.push(ride);
-        }
-      });
-      props.sendFilteredData(filteredData);
-
-      // filteredData.map((ride, index) => {
-      //   ride.distance = dis.shift();
-      //   console.log(ride.distance);
-      // });
-
-      // props.sendFilteredData(filteredData);
+    if (e.target.textContent === "Past rides") {
+      props.sendIsPast(true);
+      props.sendIsUpcoming(false);
+      props.sendIsNearest(false);
+      props.sortPast();
     } else if (e.target.textContent === "Upcoming rides") {
-      //
+      props.sendIsUpcoming(true);
+      props.sendIsPast(false);
+      props.sendIsNearest(false);
+      props.sortUpcoming();
     } else {
-      //
+      props.sendIsNearest(true);
+      props.sendIsUpcoming(false);
+      props.sendIsPast(false);
+      props.sortNearest();
     }
   }
 
