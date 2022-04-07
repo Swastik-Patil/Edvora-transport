@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 function NavControl(props) {
   const options = document.querySelectorAll(".NavItems");
@@ -8,7 +8,6 @@ function NavControl(props) {
 
   let cities = removeDuplicates(props.cityList.sort());
   let states = removeDuplicates(props.stateList.sort());
-  let nearest = props.nearest;
   let rides = props.rides;
   let selectedState = "";
   let selectedCity = "";
@@ -48,33 +47,26 @@ function NavControl(props) {
 
     // Selection of Nearest , Upcoming , Past Rides
     if (e.target.textContent === "Past rides") {
-      props.sendIsPast(true);
-      props.sendIsUpcoming(false);
-      props.sendIsNearest(false);
-      props.sortPast();
+      props.getActiveTab(e);
     } else if (e.target.textContent === "Upcoming rides") {
-      props.sendIsUpcoming(true);
-      props.sendIsPast(false);
-      props.sendIsNearest(false);
-      props.sortUpcoming();
+      props.getActiveTab(e);
     } else {
-      props.sendIsNearest(true);
-      props.sendIsUpcoming(false);
-      props.sendIsPast(false);
-      props.sortNearest();
+      props.getActiveTab(e);
     }
   }
 
   const handleFilter = (e) => {
-    selectedCity = city.options[city.selectedIndex].text;
-    selectedState = state.options[state.selectedIndex].text;
+    selectedCity = city.options[city.selectedIndex].value;
+    selectedState = state.options[state.selectedIndex].value;
 
     if (selectedState === "State" && selectedCity === "City") {
       filteredData = props.rides;
       props.sendFilteredData(filteredData);
+      props.isFiltered(e);
     } else if (selectedState !== "State" || selectedCity !== "City") {
-      filteredData = nearest.filter(validateLocation);
+      filteredData = rides.filter(validateLocation);
       props.sendFilteredData(filteredData);
+      props.isFiltered(e);
     }
   };
 
@@ -100,22 +92,22 @@ function NavControl(props) {
           <div className="filterTitle">Filters</div>
           <div className="filterItem">
             <select name="state" id="state" onChange={handleFilter}>
-              <option value="State">State</option>
               {states.map((state, index) => (
                 <option key={index} value={state}>
                   {state}
                 </option>
               ))}
+              <option value="State">State</option>
             </select>
           </div>
           <div className="filterItem">
             <select name="city" id="city" onChange={handleFilter}>
-              <option value="City">City</option>
               {cities.map((city, index) => (
                 <option key={index} value={city}>
                   {city}
                 </option>
               ))}
+              <option value="City">City</option>
             </select>
           </div>
         </div>

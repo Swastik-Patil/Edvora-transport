@@ -9,11 +9,10 @@ function App() {
   const usersApi = "https://assessment.api.vweb.app/user";
 
   const [filteredData, setFilteredData] = useState([]);
-  const [filteredNearestData, setFilteredNearestData] = useState([]);
-  const [filteredPastData, setFilteredPastData] = useState([]);
   let [isNearest, setIsNearest] = useState(true);
   let [isUpcoming, setIsUpcoming] = useState(false);
   let [isPast, setIsPast] = useState(false);
+  const [isFilteredData, setIsFilteredData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,7 +35,6 @@ function App() {
   const cities = [];
   const states = [];
   let rides = data;
-  let nearest = data;
 
   const [nearestArray, setNearestArray] = useState([]);
   const [pastRidesArray, setPastRidesArray] = useState([]);
@@ -48,25 +46,38 @@ function App() {
   const sendFilteredData = (data) => {
     setFilteredData(data);
   };
-  const sendIsNearest = (data) => {
-    setIsNearest(data);
-  };
-  const sendIsUpcoming = (data) => {
-    setIsUpcoming(data);
-  };
-  const sendIsPast = (data) => {
-    setIsPast(data);
-  };
 
   // For addding cities and states to the dropdown
-
-  Object.values(rides).map(
-    (ride, index) => (cities.push(ride.city), states.push(ride.state))
-  );
-
   setTimeout(() => {
     return sortNearest();
   }, 500);
+
+  function isFiltered(e) {
+    if (e.target.selected) {
+      setIsFilteredData(true);
+    } else {
+      setIsFilteredData(false);
+    }
+  }
+
+  function getActiveTab(e) {
+    if (e.target.textContent === "Nearest rides") {
+      setIsNearest(true);
+      setIsUpcoming(false);
+      setIsPast(false);
+      sortNearest();
+    } else if (e.target.textContent === "Upcoming rides") {
+      setIsNearest(false);
+      setIsUpcoming(true);
+      setIsPast(false);
+      sortUpcoming();
+    } else if (e.target.textContent === "Past rides") {
+      setIsNearest(false);
+      setIsUpcoming(false);
+      setIsPast(true);
+      sortPast();
+    }
+  }
 
   function sortNearest() {
     const closest = (arr, num) => {
@@ -82,7 +93,7 @@ function App() {
     };
 
     setNearestArray(
-      ride_data.sort((a, b) => {
+      [].slice.call(rides).sort((a, b) => {
         if (
           closest(a.station_path, userLocation) >
           closest(b.station_path, userLocation)
@@ -95,103 +106,121 @@ function App() {
     );
   }
 
-  const sortPast = () => {
-    setPastRidesArray(
-      ride_data.filter(
-        (singleRide) => singleRide.date < new Date().toISOString().slice(0, 10)
-      )
-    );
-  };
-
-  const sortUpcoming = () => {
+  function sortUpcoming() {
     setUpComingArray(
       ride_data.filter(
         (singleRide) => singleRide.date > new Date().toISOString().slice(0, 10)
       )
     );
-  };
+  }
+
+  function sortPast() {
+    let sorted = ride_data.filter(
+      (singleRide) => singleRide.date < new Date().toISOString().slice(0, 10)
+    );
+    setPastRidesArray(sorted);
+  }
+
   return (
     <>
       <Header avatar={user.url} name={user.name} />
       <NavControl
         cityList={cities}
         stateList={states}
-        nearest={nearest}
         sendFilteredData={sendFilteredData}
-        sendIsNearest={sendIsNearest}
-        sendIsUpcoming={sendIsUpcoming}
-        sendIsPast={sendIsPast}
-        sortNearest={sortNearest}
+        isFiltered={isFiltered}
+        getActiveTab={getActiveTab}
         sortPast={sortPast}
         sortUpcoming={sortUpcoming}
         rides={rides}
       />
       {isNearest
-        ? nearestArray.length > 0
-          ? nearestArray.map((ride, index) => (
-              <Rides
-                key={index}
-                id={ride.id}
-                origin_station={ride.origin_station_code}
-                station_path={ride.station_path}
-                date={ride.date}
-                map_url={ride.map_url}
-                city={ride.city}
-                state={ride.state}
-                destination_station_code={ride.destination_station_code}
-                station_code={user.station_code}
-                rides={rides}
-              />
-            ))
-          : Object.values(filteredData).map((ride, index) => (
-              <Rides
-                key={index}
-                id={ride.id}
-                origin_station={ride.origin_station_code}
-                station_path={ride.station_path}
-                date={ride.date}
-                map_url={ride.map_url}
-                city={ride.city}
-                state={ride.state}
-                destination_station_code={ride.destination_station_code}
-                station_code={user.station_code}
-                rides={rides}
-              />
-            ))
-        : isUpcoming
-        ? upComingArray.length > 0
-          ? upComingArray.map((ride, index) => (
-              <Rides
-                key={index}
-                id={ride.id}
-                origin_station={ride.origin_station_code}
-                station_path={ride.station_path}
-                date={ride.date}
-                map_url={ride.map_url}
-                city={ride.city}
-                state={ride.state}
-                destination_station_code={ride.destination_station_code}
-                station_code={user.station_code}
-                rides={rides}
-              />
-            ))
-          : null
-        : pastRidesArray.length > 0
-        ? pastRidesArray.map((ride, index) => (
-            <Rides
-              key={index}
-              id={ride.id}
-              origin_station={ride.origin_station_code}
-              station_path={ride.station_path}
-              date={ride.date}
-              map_url={ride.map_url}
-              city={ride.city}
-              state={ride.state}
-              destination_station_code={ride.destination_station_code}
-              station_code={user.station_code}
-              rides={rides}
-            />
-          ))
+        ? nearestArray.map(
+            (ride, index) => (
+              (cities.push(ride.city), states.push(ride.state)),
+              (
+                <Rides
+                  key={index}
+                  id={ride.id}
+                  origin_station={ride.origin_station_code}
+                  station_path={ride.station_path}
+                  date={ride.date}
+                  map_url={ride.map_url}
+                  city={ride.city}
+                  state={ride.state}
+                  destination_station_code={ride.destination_station_code}
+                  station_code={user.station_code}
+                  rides={rides}
+                />
+              )
+            )
+          )
+        : null}
+      {isUpcoming
+        ? upComingArray.map(
+            (ride, index) => (
+              (cities.push(ride.city), states.push(ride.state)),
+              (
+                <Rides
+                  key={index}
+                  id={ride.id}
+                  origin_station={ride.origin_station_code}
+                  station_path={ride.station_path}
+                  date={ride.date}
+                  map_url={ride.map_url}
+                  city={ride.city}
+                  state={ride.state}
+                  destination_station_code={ride.destination_station_code}
+                  station_code={user.station_code}
+                  rides={rides}
+                />
+              )
+            )
+          )
+        : null}
+      {isPast
+        ? pastRidesArray.map(
+            (ride, index) => (
+              (cities.push(ride.city), states.push(ride.state)),
+              (
+                <Rides
+                  key={index}
+                  id={ride.id}
+                  origin_station={ride.origin_station_code}
+                  station_path={ride.station_path}
+                  date={ride.date}
+                  map_url={ride.map_url}
+                  city={ride.city}
+                  state={ride.state}
+                  destination_station_code={ride.destination_station_code}
+                  station_code={user.station_code}
+                  rides={rides}
+                />
+              )
+            )
+          )
+        : null}
+      {isFilteredData
+        ? Object.values(filteredData).map(
+            (ride, index) => (
+              (cities.push(ride.city), states.push(ride.state)),
+              (
+                <Rides
+                  key={index}
+                  id={ride.id}
+                  origin_station={ride.origin_station_code}
+                  station_path={ride.station_path}
+                  date={ride.date}
+                  map_url={ride.map_url}
+                  city={ride.city}
+                  state={ride.state}
+                  destination_station_code={ride.destination_station_code}
+                  station_code={user.station_code}
+                  rides={rides}
+                />
+              )
+            )
+          )
         : null}
     </>
   );
