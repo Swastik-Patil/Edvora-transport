@@ -48,6 +48,7 @@ function NavControl(props) {
     // Selection of Nearest , Upcoming , Past Rides
     if (e.target.textContent === "Past rides") {
       props.getActiveTab(e);
+      handleFilter(e);
     } else if (e.target.textContent === "Upcoming rides") {
       props.getActiveTab(e);
     } else {
@@ -61,12 +62,14 @@ function NavControl(props) {
 
     if (selectedState === "State" && selectedCity === "City") {
       filteredData = props.rides;
-      props.sendFilteredData(filteredData);
-      props.isFiltered(e);
+      props.sortNearest(filteredData);
+      props.sortUpcoming(filteredData);
+      props.sortPast(filteredData);
     } else if (selectedState !== "State" || selectedCity !== "City") {
       filteredData = rides.filter(validateLocation);
-      props.sendFilteredData(filteredData);
-      props.isFiltered(e);
+      props.sortNearest(filteredData);
+      props.sortUpcoming(filteredData);
+      props.sortPast(filteredData);
     }
   };
 

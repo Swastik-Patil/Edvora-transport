@@ -8,12 +8,6 @@ function App() {
   const ridesApi = "https://assessment.api.vweb.app/rides";
   const usersApi = "https://assessment.api.vweb.app/user";
 
-  const [filteredData, setFilteredData] = useState([]);
-  let [isNearest, setIsNearest] = useState(true);
-  let [isUpcoming, setIsUpcoming] = useState(false);
-  let [isPast, setIsPast] = useState(false);
-  const [isFilteredData, setIsFilteredData] = useState([]);
-
   useEffect(() => {
     const fetchData = async () => {
       fetch(usersApi)
@@ -28,58 +22,56 @@ function App() {
     };
 
     fetchData();
+    load();
   }, []);
 
-  const [data, setData] = useState("");
-  const [user, setUser] = useState("");
+  const [filteredData, setFilteredData] = useState([]);
+  let [isNearest, setIsNearest] = useState(true);
+  let [isUpcoming, setIsUpcoming] = useState(false);
+  let [isPast, setIsPast] = useState(false);
+  const [nearestArray, setNearestArray] = useState([]);
+  const [pastRidesArray, setPastRidesArray] = useState([]);
+  const [upComingArray, setUpComingArray] = useState([]);
+  const [data, setData] = useState([]);
+  const [user, setUser] = useState([]);
+  const [loaded, setLoaded] = useState(false);
   const cities = [];
   const states = [];
   let rides = data;
 
-  const [nearestArray, setNearestArray] = useState([]);
-  const [pastRidesArray, setPastRidesArray] = useState([]);
-  const [upComingArray, setUpComingArray] = useState([]);
-
   const userLocation = user.station_code;
   const ride_data = rides;
 
-  const sendFilteredData = (data) => {
-    setFilteredData(data);
+  let load = () => {
+    if (!loaded) {
+      sortNearest(filteredData);
+      setLoaded(true);
+    } else {
+      return;
+    }
   };
 
   // For addding cities and states to the dropdown
-  setTimeout(() => {
-    return sortNearest();
-  }, 500);
-
-  function isFiltered(e) {
-    if (e.target.selected) {
-      setIsFilteredData(true);
-    } else {
-      setIsFilteredData(false);
-    }
-  }
-
   function getActiveTab(e) {
-    if (e.target.textContent === "Nearest rides") {
-      setIsNearest(true);
+    if (e.target.textContent === "Past rides") {
+      setIsNearest(false);
       setIsUpcoming(false);
-      setIsPast(false);
-      sortNearest();
+      setIsPast(true);
+      sortPast(filteredData);
     } else if (e.target.textContent === "Upcoming rides") {
       setIsNearest(false);
       setIsUpcoming(true);
       setIsPast(false);
-      sortUpcoming();
-    } else if (e.target.textContent === "Past rides") {
-      setIsNearest(false);
+      sortUpcoming(filteredData);
+    } else {
+      setIsNearest(true);
       setIsUpcoming(false);
-      setIsPast(true);
-      sortPast();
+      setIsPast(false);
+      sortNearest(filteredData);
     }
   }
 
-  function sortNearest() {
+  function sortNearest(e) {
     const closest = (arr, num) => {
       return (
         arr.reduce((acc, val) => {
@@ -92,8 +84,10 @@ function App() {
       );
     };
 
-    setNearestArray(
-      [].slice.call(rides).sort((a, b) => {
+    let sorted = [];
+
+    if (e.length > 0) {
+      sorted = [].slice.call(e).sort((a, b) => {
         if (
           closest(a.station_path, userLocation) >
           closest(b.station_path, userLocation)
@@ -102,11 +96,23 @@ function App() {
         } else {
           return -1;
         }
-      })
-    );
+      });
+    } else {
+      sorted = [].slice.call(rides).sort((a, b) => {
+        if (
+          closest(a.station_path, userLocation) >
+          closest(b.station_path, userLocation)
+        ) {
+          return 1;
+        } else {
+          return -1;
+        }
+      });
+    }
+    setNearestArray(sorted);
   }
 
-  function sortUpcoming() {
+  function sortUpcoming(e) {
     setUpComingArray(
       ride_data.filter(
         (singleRide) => singleRide.date > new Date().toISOString().slice(0, 10)
@@ -114,10 +120,17 @@ function App() {
     );
   }
 
-  function sortPast() {
-    let sorted = ride_data.filter(
-      (singleRide) => singleRide.date < new Date().toISOString().slice(0, 10)
-    );
+  function sortPast(e) {
+    let sorted = [];
+    if (e.length > 0) {
+      sorted = e.filter(
+        (singleRide) => singleRide.date < new Date().toISOString().slice(0, 10)
+      );
+    } else {
+      sorted = ride_data.filter(
+        (singleRide) => singleRide.date < new Date().toISOString().slice(0, 10)
+      );
+    }
     setPastRidesArray(sorted);
   }
 
@@ -127,9 +140,8 @@ function App() {
       <NavControl
         cityList={cities}
         stateList={states}
-        sendFilteredData={sendFilteredData}
-        isFiltered={isFiltered}
         getActiveTab={getActiveTab}
+        sortNearest={sortNearest}
         sortPast={sortPast}
         sortUpcoming={sortUpcoming}
         rides={rides}
@@ -180,28 +192,6 @@ function App() {
         : null}
       {isPast
         ? pastRidesArray.map(
-            (ride, index) => (
-              (cities.push(ride.city), states.push(ride.state)),
-              (
-                <Rides
-                  key={index}
-                  id={ride.id}
-                  origin_station={ride.origin_station_code}
-                  station_path={ride.station_path}
-                  date={ride.date}
-                  map_url={ride.map_url}
-                  city={ride.city}
-                  state={ride.state}
-                  destination_station_code={ride.destination_station_code}
-                  station_code={user.station_code}
-                  rides={rides}
-                />
-              )
-            )
-          )
-        : null}
-      {isFilteredData
-        ? Object.values(filteredData).map(
             (ride, index) => (
               (cities.push(ride.city), states.push(ride.state)),
               (
