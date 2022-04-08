@@ -22,7 +22,6 @@ function App() {
     };
 
     fetchData();
-    load();
   }, []);
 
   const [filteredData, setFilteredData] = useState([]);
@@ -34,22 +33,12 @@ function App() {
   const [upComingArray, setUpComingArray] = useState([]);
   const [data, setData] = useState([]);
   const [user, setUser] = useState([]);
-  const [loaded, setLoaded] = useState(false);
   const cities = [];
   const states = [];
   let rides = data;
 
   const userLocation = user.station_code;
   const ride_data = rides;
-
-  let load = () => {
-    if (!loaded) {
-      sortNearest(filteredData);
-      setLoaded(true);
-    } else {
-      return;
-    }
-  };
 
   // For addding cities and states to the dropdown
   function getActiveTab(e) {
@@ -110,6 +99,8 @@ function App() {
       });
     }
     setNearestArray(sorted);
+    let instr = document.querySelector([".instruction"]);
+    instr.classList.add("hide");
   }
 
   function sortUpcoming(e) {
@@ -146,6 +137,7 @@ function App() {
         sortUpcoming={sortUpcoming}
         rides={rides}
       />
+      <div className="instruction">Click On Nearest Rides</div>
       {isNearest
         ? nearestArray.map(
             (ride, index) => (
